@@ -43,12 +43,13 @@ int main(int argc, char *argv[]) {
   long current_position = file_length - to_read;
 
   unsigned int lines = 1; /* Last line counts immediately */
+  long first_line_position = 0;
 
   char buffer[BUF_SIZE];
   size_t last_read = 0;
   size_t total_read = 0;
 
-  while (total_read != file_length) {
+  while (total_read != file_length && lines != num) {
     if (fseek(file, current_position, SEEK_SET) == -1) {
       errexit("could not seek file");
     }
@@ -65,7 +66,10 @@ int main(int argc, char *argv[]) {
       size_t index = last_read - i - 1;
 
       if (buffer[index] == '\n') {
-        lines++;
+        if (++lines == num) {
+          first_line_position = current_position + index;
+          break;
+        }
       }
     }
 
